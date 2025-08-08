@@ -1,31 +1,32 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_IMAGE = "raghavender123456/game"
+    }
+
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
+
         stage('Build Docker Image') {
             steps {
-                script {
-                    sh "docker build -t ${env.DOCKER_IMAGE}:${env.BUILD_NUMBER} ."
-
-                    
-                }
+                sh "docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} ."
             }
         }
+
         stage('Push to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
-                    sh "docker push raghavachari93/game:${env.BUILD_NUMBER}"
-                    sh "docker tag raghavachari93/game:${env.BUILD_NUMBER} raghavachari93/game:latest"
-                    sh "docker push raghavachari93/game:latest"
+                    sh "docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}"
+                    sh "docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest"
+                    sh "docker push ${DOCKER_IMAGE}:latest"
                 }
             }
         }
     }
 }
-
