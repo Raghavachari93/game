@@ -10,7 +10,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("raghavachari93/game:${env.BUILD_NUMBER}")
+                    sh "docker build -t ${env.DOCKER_IMAGE}:${env.BUILD_NUMBER} ."
+
+                    
                 }
             }
         }
@@ -26,3 +28,4 @@ pipeline {
         }
     }
 }
+
